@@ -14,13 +14,11 @@ class CompilerContext(object):
         for arg in args:
             self.data.append(chr(arg))
 
-    def emit_conditional_jump(self, bc):
-        pos = len(self.data)
-        self.emit(bc, 0)
-        return pos + 1
+    def get_pos(self):
+        return len(self.data)
 
     def patch_jump(self, pos):
-        self.data[pos] = chr(len(self.data))
+        self.data[pos + 1] = chr(len(self.data))
 
     def create_name(self, name):
         if name not in self.names:

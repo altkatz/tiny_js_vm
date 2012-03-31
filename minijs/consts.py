@@ -11,7 +11,9 @@ BYTECODES = [
     ("BINARY_SUB", 0, -1),
     ("BINARY_MUL", 0, -1),
     ("BINARY_DIV", 0, -1),
+    ("BINARY_LT", 0, -1),
 
+    ("JUMP", 1, 0),
     ("JUMP_IF_FALSE", 1, -1),
 
     ("DISCARD_TOP", 0, -1),
@@ -35,4 +37,5 @@ BINOP_BYTECODE = {
     "-": BINARY_SUB,
     "*": BINARY_MUL,
     "/": BINARY_DIV,
+    "<": BINARY_LT,
 }

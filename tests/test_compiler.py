@@ -68,3 +68,26 @@ class TestCompiler(object):
         DISCARD_TOP
         RETURN_NULL
         """)
+
+    def test_while(self, space):
+        self.assert_compiles(space, """
+        i = 0;
+        while (i < 10) {
+            i = i + 1;
+        }
+        """, """
+        LOAD_CONST 0
+        STORE_NAME 0
+        DISCARD_TOP
+        LOAD_NAME 0
+        LOAD_CONST 1
+        BINARY_LT
+        JUMP_IF_FALSE 22
+        LOAD_NAME 0
+        LOAD_CONST 2
+        BINARY_ADD
+        STORE_NAME 0
+        DISCARD_TOP
+        JUMP 5
+        RETURN_NULL
+        """)

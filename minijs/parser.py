@@ -52,14 +52,25 @@ class If(Node):
 
     def compile(self, ctx):
         self.cond.compile(ctx)
-        pos = ctx.emit_conditional_jump(consts.JUMP_IF_FALSE)
+        pos = ctx.get_pos()
+        ctx.emit(consts.JUMP_IF_FALSE, 0)
         self.body.compile(ctx)
         ctx.patch_jump(pos)
 
 class While(Node):
     def __init__(self, cond, body):
-        self.cnod = cond
+        self.cond = cond
         self.body = body
+
+    def compile(self, ctx):
+        back_jump_target = ctx.get_pos()
+        self.cond.compile(ctx)
+        pos = ctx.get_pos()
+        ctx.emit(consts.JUMP_IF_FALSE, 0)
+        self.body.compile(ctx)
+        ctx.emit(consts.JUMP, back_jump_target)
+        ctx.patch_jump(pos)
+
 
 class BinOp(Node):
     def __init__(self, op, lhs, rhs):
