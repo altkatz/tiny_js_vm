@@ -8,6 +8,7 @@ class CompilerContext(object):
         self.data = []
         self.consts = []
         self.names = {}
+        self.float_consts = {}
 
     def emit(self, bc, *args):
         self.data.append(chr(bc))
@@ -26,9 +27,10 @@ class CompilerContext(object):
         return self.names[name]
 
     def create_float_const(self, floatval):
-        pos = len(self.consts)
-        self.consts.append(self.space.newfloat(floatval))
-        return pos
+        if floatval not in self.float_consts:
+            self.float_consts[floatval] = len(self.consts)
+            self.consts.append(self.space.newfloat(floatval))
+        return self.float_consts[floatval]
 
     def create_bytecode(self):
         bcs = "".join(self.data)

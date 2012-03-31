@@ -51,7 +51,7 @@ class TestCompiler(object):
         LOAD_CONST 1
         BINARY_MUL
         LOAD_CONST 2
-        LOAD_CONST 3 # should be 1 after we merge consts
+        LOAD_CONST 1
         BINARY_DIV
         BINARY_SUB
         DISCARD_TOP
@@ -63,7 +63,7 @@ class TestCompiler(object):
         LOAD_CONST 0
         JUMP_IF_FALSE 10
         LOAD_CONST 1
-        LOAD_CONST 2 # will be 1 after merge consts
+        LOAD_CONST 1
         BINARY_ADD
         DISCARD_TOP
         RETURN_NULL
