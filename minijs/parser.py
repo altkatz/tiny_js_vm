@@ -2,6 +2,8 @@ import os
 
 from pypy.rlib.parsing.ebnfparse import parse_ebnf, make_parse_function
 
+from minijs import consts
+
 
 with open(os.path.join(os.path.dirname(__file__), "grammar.txt")) as f:
     grammar = f.read()
@@ -15,18 +17,33 @@ class Node(object):
     def __eq__(self, other):
         return type(self) is type(other) and self.__dict__ == other.__dict__
 
+    def compile(self, ctx):
+        raise NotImplementedError(type(self).__name__)
+
 class Block(Node):
     def __init__(self, stmts):
         self.stmts = stmts
+
+    def compile(self, ctx):
+        for stmt in self.stmts:
+            stmt.compile(ctx)
 
 class Stmt(Node):
     def __init__(self, expr):
         self.expr = expr
 
+    def compile(self, ctx):
+        self.expr.compile(ctx)
+        ctx.emit(consts.DISCARD_TOP)
+
 class Assignment(Node):
     def __init__(self, var, expr):
         self.var = var
         self.expr = expr
+
+    def compile(self, ctx):
+        self.expr.compile(ctx)
+        ctx.emit(consts.STORE_NAME, ctx.create_name(self.var))
 
 class If(Node):
     def __init__(self, cond, body):
@@ -51,6 +68,9 @@ class Variable(Node):
 class ConstantFloat(Node):
     def __init__(self, floatval):
         self.floatval = floatval
+
+    def compile(self, ctx):
+        ctx.emit(consts.LOAD_CONST, ctx.create_float_const(self.floatval))
 
 
 class Transformer(object):
