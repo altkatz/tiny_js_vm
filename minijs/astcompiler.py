@@ -35,7 +35,7 @@ class CompilerContext(object):
     def create_bytecode(self):
         bcs = "".join(self.data)
         max_stackdepth = self.count_stackdepth(bcs)
-        return Bytecode(bcs, max_stackdepth, self.consts)
+        return Bytecode(bcs, max_stackdepth, self.consts, self.names)
 
     def count_stackdepth(self, bc):
         i = 0
