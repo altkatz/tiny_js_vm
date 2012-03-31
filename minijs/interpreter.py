@@ -50,9 +50,30 @@ class Interpreter(object):
     def STORE_NAME(self, space, bytecode, frame, pc, idx):
         frame.locals_w[idx] = frame.peek()
 
+    def _new_binop(opname):
+        def impl(self, space, bytecode, frame, pc):
+            w_rhs = frame.pop()
+            w_lhs = frame.pop()
+            method = getattr(space, opname)
+            return frame.push(method(w_lhs, w_rhs))
+        impl.__name__ = "BINARY_%s" % opname.upper()
+        return impl
+    BINARY_SUB = _new_binop("sub")
+    BINARY_GE = _new_binop("ge")
+
+
     def PRINT_ITEM(self, space, bytecode, frame, pc):
         w_obj = frame.pop()
         self.print_(space.str_w(space.str(w_obj)))
+
+    def JUMP(self, space, bytecode, frame, pc, target_pc):
+        return target_pc
+
+    def JUMP_IF_FALSE(self, space, bytecode, frame, pc, target_pc):
+        w_obj = frame.pop()
+        if space.bool_w(space.bool(w_obj)):
+            return pc
+        return target_pc
 
     def DISCARD_TOP(self, space, bytecode, frame, pc):
         frame.pop()

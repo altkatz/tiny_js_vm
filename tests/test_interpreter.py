@@ -23,3 +23,13 @@ class TestInterpreter(object):
     def test_simple(self, space):
         output = self.run(space, "x = 3; print x;")
         assert output == ["3.0"]
+
+    def test_while_loop(self, space):
+        output = self.run(space, """
+        i = 3;
+        while (i >= 0) {
+            print i;
+            i = i - 1;
+        }
+        """)
+        assert output == ["3.0", "2.0", "1.0", "0.0"]

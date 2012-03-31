@@ -12,6 +12,7 @@ BYTECODES = [
     ("BINARY_MUL", 0, -1),
     ("BINARY_DIV", 0, -1),
     ("BINARY_LT", 0, -1),
+    ("BINARY_GE", 0, -1),
 
     ("PRINT_ITEM", 0, -1),
 
@@ -40,4 +41,5 @@ BINOP_BYTECODE = {
     "*": BINARY_MUL,
     "/": BINARY_DIV,
     "<": BINARY_LT,
+    ">=": BINARY_GE,
 }
