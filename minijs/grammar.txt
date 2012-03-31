@@ -1,0 +1,10 @@
+FLOAT: "[0-9]+";
+main: statement* [EOF];
+
+statement: expr ";";
+
+expr: comparison;
+
+comparison: primary;
+primary: atom;
+atom: FLOAT;
