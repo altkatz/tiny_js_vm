@@ -13,6 +13,8 @@ BYTECODES = [
     ("BINARY_DIV", 0, -1),
     ("BINARY_LT", 0, -1),
 
+    ("PRINT_ITEM", 0, -1),
+
     ("JUMP", 1, 0),
     ("JUMP_IF_FALSE", 1, -1),
 

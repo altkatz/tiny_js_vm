@@ -71,6 +71,13 @@ class While(Node):
         ctx.emit(consts.JUMP, back_jump_target)
         ctx.patch_jump(pos)
 
+class Print(Node):
+    def __init__(self, expr):
+        self.expr = expr
+
+    def compile(self, ctx):
+        self.expr.compile(ctx)
+        ctx.emit(consts.PRINT_ITEM)
 
 class BinOp(Node):
     def __init__(self, op, lhs, rhs):
@@ -120,6 +127,8 @@ class Transformer(object):
             return self.visit_if(node)
         elif info == "while":
             return self.visit_while(node)
+        elif info == "print":
+            return self.visit_print(node)
         raise NotImplementedError
 
     def visit_if(self, node):
@@ -132,6 +141,11 @@ class Transformer(object):
         return While(
             self.visit_expr(node.children[2]),
             self.visit_block(node.children[5]),
+        )
+
+    def visit_print(self, node):
+        return Print(
+            self.visit_expr(node.children[1])
         )
 
     def visit_expr(self, node):

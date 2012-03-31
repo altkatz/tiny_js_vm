@@ -1,5 +1,5 @@
-from minijs.parser import (Block, Stmt, If, While, Assignment, BinOp, Variable,
-    ConstantFloat)
+from minijs.parser import (Block, Stmt, If, While, Print, Assignment, BinOp,
+    Variable, ConstantFloat)
 
 
 class TestParser(object):
@@ -71,3 +71,6 @@ class TestParser(object):
                 ])
             ),
         ])
+
+    def test_print(self, space):
+        assert space.parse("print 3;") == Block([Print(ConstantFloat(3))])

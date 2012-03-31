@@ -11,7 +11,8 @@ main: statement* [EOF];
 
 statement: expr ";" |
            "if" "(" expr ")" "{" statement* "}" |
-           "while" "(" expr ")" "{" statement* "}";
+           "while" "(" expr ")" "{" statement* "}" |
+           "print" expr ";";
 
 expr: assignment | comparison;
 

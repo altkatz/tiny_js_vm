@@ -91,3 +91,10 @@ class TestCompiler(object):
         JUMP 5
         RETURN_NULL
         """)
+
+    def test_print(self, space):
+        self.assert_compiles(space, "print 3;", """
+        LOAD_CONST 0
+        PRINT_ITEM
+        RETURN_NULL
+        """)
