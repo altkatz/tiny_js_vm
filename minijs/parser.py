@@ -23,6 +23,12 @@ class Stmt(Node):
     def __init__(self, expr):
         self.expr = expr
 
+class BinOp(Node):
+    def __init__(self, op, lhs, rhs):
+        self.op = op
+        self.lhs = lhs
+        self.rhs = rhs
+
 class ConstantFloat(Node):
     def __init__(self, floatval):
         self.floatval = floatval
@@ -49,15 +55,22 @@ class Transformer(object):
     def visit_expr(self, node):
         if node.symbol == "expr":
             node = node.children[0]
-        if node.symbol == "comparison":
+
+        symname = node.symbol
+        if symname in ["additive", "multitive", "comparison"]:
             return self.visit_subexpr(node)
-        elif node.symbol == "primary":
+        elif symname == "primary":
             return self.visit_primary(node)
         raise NotImplementedError
 
     def visit_subexpr(self, node):
         if len(node.children) == 1:
             return self.visit_expr(node.children[0])
+        return BinOp(
+            node.children[1].additional_info,
+            self.visit_expr(node.children[0]),
+            self.visit_expr(node.children[2]),
+        )
         raise NotImplementedError
 
     def visit_primary(self, node):

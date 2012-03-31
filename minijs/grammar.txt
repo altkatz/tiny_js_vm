@@ -1,10 +1,19 @@
+IGNORE: "[ \t\n]";
+
+ADD_OPER: "[+-]";
+MULT_OPER: "[*/]";
+COMP_OPER: "(==)|(>=)|(<=)|>|<|(!=)";
+
 FLOAT: "[0-9]+";
+
 main: statement* [EOF];
 
 statement: expr ";";
 
 expr: comparison;
 
-comparison: primary;
+comparison: additive COMP_OPER comparison | additive;
+additive: multitive ADD_OPER additive | multitive;
+multitive: primary MULT_OPER multitive | primary;
 primary: atom;
 atom: FLOAT;
