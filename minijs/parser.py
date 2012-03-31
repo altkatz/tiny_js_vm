@@ -50,6 +50,12 @@ class If(Node):
         self.cond = cond
         self.body = body
 
+    def compile(self, ctx):
+        self.cond.compile(ctx)
+        pos = ctx.emit_conditional_jump(consts.JUMP_IF_FALSE)
+        self.body.compile(ctx)
+        ctx.patch_jump(pos)
+
 class While(Node):
     def __init__(self, cond, body):
         self.cnod = cond
@@ -61,9 +67,17 @@ class BinOp(Node):
         self.lhs = lhs
         self.rhs = rhs
 
+    def compile(self, ctx):
+        self.lhs.compile(ctx)
+        self.rhs.compile(ctx)
+        ctx.emit(consts.BINOP_BYTECODE[self.op])
+
 class Variable(Node):
     def __init__(self, var):
         self.var = var
+
+    def compile(self, ctx):
+        ctx.emit(consts.LOAD_NAME, ctx.create_name(self.var))
 
 class ConstantFloat(Node):
     def __init__(self, floatval):

@@ -4,11 +4,13 @@ from minijs import consts
 class TestCompiler(object):
     def assert_compiles(self, space, source, expected_bytecode):
         bc = space.compile(source)
-        expected = [
-            line.strip()
-            for line in expected_bytecode.splitlines()
-            if line.strip()
-        ]
+        expected = []
+        for line in expected_bytecode.splitlines():
+            if "#" in line:
+                line = line[:line.index("#")]
+            line = line.strip()
+            if line:
+                expected.append(line)
 
         actual = []
         i = 0
@@ -33,3 +35,36 @@ class TestCompiler(object):
         [c] = bc.consts
         assert c.floatval == 3
         assert bc.max_stackdepth == 1
+
+    def test_addition(self, space):
+        self.assert_compiles(space, "a + 2;", """
+        LOAD_NAME 0
+        LOAD_CONST 0
+        BINARY_ADD
+        DISCARD_TOP
+        RETURN_NULL
+        """)
+
+    def test_binops(self, space):
+        self.assert_compiles(space, "(2 * 4) - (3 / 4);", """
+        LOAD_CONST 0
+        LOAD_CONST 1
+        BINARY_MUL
+        LOAD_CONST 2
+        LOAD_CONST 3 # should be 1 after we merge consts
+        BINARY_DIV
+        BINARY_SUB
+        DISCARD_TOP
+        RETURN_NULL
+        """)
+
+    def test_if(self, space):
+        self.assert_compiles(space, "if (3) { 2 + 2; }", """
+        LOAD_CONST 0
+        JUMP_IF_FALSE 10
+        LOAD_CONST 1
+        LOAD_CONST 2 # will be 1 after merge consts
+        BINARY_ADD
+        DISCARD_TOP
+        RETURN_NULL
+        """)
