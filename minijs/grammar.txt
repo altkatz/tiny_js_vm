@@ -9,14 +9,16 @@ NAME: "[a-zA-Z_][a-zA-Z0-9_]*";
 
 main: statement* [EOF];
 
-statement: expr ";";
+statement: expr ";" |
+           "if" "(" expr ")" "{" statement* "}" |
+           "while" "(" expr ")" "{" statement* "}";
 
 expr: assignment | comparison;
 
 comparison: additive COMP_OPER comparison | additive;
 additive: multitive ADD_OPER additive | multitive;
 multitive: primary MULT_OPER multitive | primary;
-primary: atom;
+primary: "(" additive ")" | atom;
 atom: FLOAT | NAME;
 
 assignment: NAME "=" expr;

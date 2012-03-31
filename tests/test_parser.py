@@ -1,4 +1,5 @@
-from minijs.parser import Block, Stmt, Assignment, BinOp, Variable, ConstantFloat
+from minijs.parser import (Block, Stmt, If, While, Assignment, BinOp, Variable,
+    ConstantFloat)
 
 
 class TestParser(object):
@@ -11,6 +12,9 @@ class TestParser(object):
 
     def test_multi_term_expr(self, space):
         assert space.parse("1 - 2 * 3;") == Block([Stmt(BinOp("-", ConstantFloat(1), BinOp("*", ConstantFloat(2), ConstantFloat(3))))])
+
+    def test_parens(self, space):
+        assert space.parse("(1 - 2) * 3;") == Block([Stmt(BinOp("*", BinOp("-", ConstantFloat(1), ConstantFloat(2)), ConstantFloat(3)))])
 
     def test_comparisons(self, space):
         assert space.parse("1 > 2;") == Block([Stmt(BinOp(">", ConstantFloat(1), ConstantFloat(2)))])
@@ -35,4 +39,35 @@ class TestParser(object):
         assert r == Block([
             Stmt(Assignment("a", ConstantFloat(3))),
             Stmt(BinOp("+", Variable("a"), ConstantFloat(2))),
+        ])
+
+    def test_if(self, space):
+        r = space.parse("""
+        if (2) {
+            a = 4;
+        }
+        """)
+        assert r == Block([
+            If(ConstantFloat(2),
+                Block([
+                    Stmt(Assignment("a", ConstantFloat(4))),
+                ])
+            ),
+        ])
+
+    def test_while(self, space):
+        r = space.parse("""
+        i = 0;
+        while (i < 10) {
+            i = i + 1;
+        }
+        """)
+        assert r == Block([
+            Stmt(Assignment("i", ConstantFloat(0))),
+            While(
+                BinOp("<", Variable("i"), ConstantFloat(10)),
+                Block([
+                    Stmt(Assignment("i", BinOp("+", Variable("i"), ConstantFloat(1))))
+                ])
+            ),
         ])

@@ -28,6 +28,16 @@ class Assignment(Node):
         self.var = var
         self.expr = expr
 
+class If(Node):
+    def __init__(self, cond, body):
+        self.cond = cond
+        self.body = body
+
+class While(Node):
+    def __init__(self, cond, body):
+        self.cnod = cond
+        self.body = body
+
 class BinOp(Node):
     def __init__(self, op, lhs, rhs):
         self.op = op
@@ -59,7 +69,25 @@ class Transformer(object):
     def visit_stmt(self, node):
         if node.children[0].symbol == "expr":
             return Stmt(self.visit_expr(node.children[0]))
+
+        info = node.children[0].additional_info
+        if info == "if":
+            return self.visit_if(node)
+        elif info == "while":
+            return self.visit_while(node)
         raise NotImplementedError
+
+    def visit_if(self, node):
+        return If(
+            self.visit_expr(node.children[2]),
+            self.visit_block(node.children[5]),
+        )
+
+    def visit_while(self, node):
+        return While(
+            self.visit_expr(node.children[2]),
+            self.visit_block(node.children[5]),
+        )
 
     def visit_expr(self, node):
         if node.symbol == "expr":
@@ -93,6 +121,8 @@ class Transformer(object):
     def visit_primary(self, node):
         if len(node.children) == 1:
             return self.visit_atom(node.children[0])
+        elif node.children[0].additional_info == "(":
+            return self.visit_expr(node.children[1])
         raise NotImplementedError
 
     def visit_atom(self, node):
