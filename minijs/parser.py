@@ -17,10 +17,15 @@ class Node(object):
 
 class Block(Node):
     def __init__(self, stmts):
-        self.stmt = stmts
+        self.stmts = stmts
 
 class Stmt(Node):
     def __init__(self, expr):
+        self.expr = expr
+
+class Assignment(Node):
+    def __init__(self, var, expr):
+        self.var = var
         self.expr = expr
 
 class BinOp(Node):
@@ -28,6 +33,10 @@ class BinOp(Node):
         self.op = op
         self.lhs = lhs
         self.rhs = rhs
+
+class Variable(Node):
+    def __init__(self, var):
+        self.var = var
 
 class ConstantFloat(Node):
     def __init__(self, floatval):
@@ -57,7 +66,9 @@ class Transformer(object):
             node = node.children[0]
 
         symname = node.symbol
-        if symname in ["additive", "multitive", "comparison"]:
+        if symname == "assignment":
+            return self.visit_assignment(node)
+        elif symname in ["additive", "multitive", "comparison"]:
             return self.visit_subexpr(node)
         elif symname == "primary":
             return self.visit_primary(node)
@@ -73,11 +84,21 @@ class Transformer(object):
         )
         raise NotImplementedError
 
+    def visit_assignment(self, node):
+        return Assignment(
+            node.children[0].additional_info,
+            self.visit_expr(node.children[2])
+        )
+
     def visit_primary(self, node):
         if len(node.children) == 1:
             return self.visit_atom(node.children[0])
         raise NotImplementedError
 
     def visit_atom(self, node):
-        if node.children[0].symbol == "FLOAT":
+        symname = node.children[0].symbol
+        if symname == "FLOAT":
             return ConstantFloat(float(node.children[0].additional_info))
+        elif symname == "NAME":
+            return Variable(node.children[0].additional_info)
+        raise NotImplementedError
